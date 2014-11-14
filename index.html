@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>
+<html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js"> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>江苏电力 管道监测系统</title>
+    <meta name="description" content="监测下水道井盖相关数据">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="www.pdwsn.com">
+
+    <!-- Zrender canvas loading-->
+    <script src="js/esl/esl.js"></script>
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+</head>
+<body>
+<!--[if lt IE 7]>
+<p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+<div class="container">
+    <div class="row">
+        <div class="span12">
+            <div id="Main" style="width:900px;height:600px;border: 1px solid #000000"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    require.config({
+        packages: [
+            {
+                name: 'zrender',
+                location: 'src',
+                main: 'zrender'
+            }
+        ]
+    });
+    require(
+            [
+                "zrender",
+                "zrender/animation/animation",
+                "zrender/shape/BezierCurve",
+                "zrender/shape/Line",
+                "zrender/shape/Image"
+            ],
+            function (zrender, Animation, BezierCurveShape, LineShape, ImageShape) {
+
+                // 初始化zrender
+                var zr = zrender.init(document.getElementById("Main"));
+                var color = require('zrender/tool/color');
+                var width = Math.ceil(zr.getWidth());
+                var height = Math.ceil(zr.getHeight());
+                var PeakNum = 2;
+                var RadinSize = width / PeakNum;
+                var MaxCotainerHeight = height;
+                var LevelHeight = 100;
+                var RadinPeak = 30;
+                var SpeedTime = 3500;
+                var pipStrokeColor = '#000';
+                var pipeLineWidth = 2;
+                var pipeHeight = height - 200;
+                DrawImage(zr, ImageShape, 'img/wall.jpg', 300, pipeHeight - 130, 400,330);
+                DrawWave(zr, BezierCurveShape, PeakNum, RadinSize, MaxCotainerHeight, LevelHeight, RadinPeak, SpeedTime, 0, 0, 'rgba(0,153,204,0.4)');
+                DrawWave(zr, BezierCurveShape, PeakNum, RadinSize, MaxCotainerHeight, LevelHeight, RadinPeak, SpeedTime, 200, 50, 'rgba(0,153,204,0.2)');
+                // 左侧 横着
+                DrawLine(zr, LineShape, 0, pipeHeight, 100, pipeHeight, pipStrokeColor, pipeLineWidth);
+                // 左侧 竖着
+                DrawLine(zr, LineShape, 100, pipeHeight, 100, pipeHeight - 150, pipStrokeColor, pipeLineWidth);
+                // 井盖 左边沿
+                DrawLine(zr, LineShape, 100, pipeHeight - 150, 120, pipeHeight - 150, pipStrokeColor, pipeLineWidth);
+                // 井盖 右边沿
+                DrawLine(zr, LineShape, 280, pipeHeight - 150, 300, pipeHeight - 150, pipStrokeColor, pipeLineWidth);
+                DrawLine(zr, LineShape, 300, pipeHeight - 150, 300, pipeHeight - 130, pipStrokeColor, pipeLineWidth);
+                DrawLine(zr, LineShape, 300, pipeHeight - 130, 700, pipeHeight - 130, pipStrokeColor, pipeLineWidth);
+                //
+                DrawLine(zr, LineShape, 300, pipeHeight - 150, 300, pipeHeight - 130, pipStrokeColor, pipeLineWidth);
+
+                zr.render();
+            });
+
+    function DrawImage(zr, ImageShape, src, x, y, width, height) {
+        var image = new ImageShape({
+            style: {
+                image: src,
+                width: width,
+                height: height,
+                x: x,
+                y: y,
+                opacity: 0.3
+            },
+            hoverable: false
+        });
+        zr.addShape(image);
+
+    }
+    /**
+     * 画直线
+     * @param zr
+     * @param LineShape
+     * @param xStart
+     * @param yStart
+     * @param xEnd
+     * @param yEnd
+     * @param strokeColor
+     * @param lineWidth
+     * @constructor
+     */
+    function DrawLine(zr, LineShape, xStart, yStart, xEnd, yEnd, strokeColor, lineWidth) {
+        var LineObj = new LineShape({
+            style: {
+                xStart: xStart,
+                yStart: yStart,
+                xEnd: xEnd,
+                yEnd: yEnd,
+                strokeColor: strokeColor,
+                lineWidth: lineWidth
+            }
+        });
+        zr.addShape(LineObj);
+    }
+    /**
+     * 画 水波
+     * @param zr
+     * @param BezierCurveShape
+     * @param PeakNum
+     * @param RadinSize
+     * @param MaxCotainerHeight
+     * @param LevelHeight
+     * @param RadinPeak
+     * @param SpeedTime
+     * @param TimeOffset
+     * @param StartOffset
+     * @param RGBA
+     * @constructor
+     */
+    function DrawWave(zr, BezierCurveShape, PeakNum, RadinSize, MaxCotainerHeight, LevelHeight, RadinPeak, SpeedTime, TimeOffset, StartOffset, RGBA) {
+        for (var i = -PeakNum - 1; i <= PeakNum; i++) {
+            var BezierCurveObj = new BezierCurveShape({
+                style: {
+                    xStart: i * RadinSize + StartOffset,
+                    yStart: MaxCotainerHeight,
+                    cpX1: i * RadinSize + RadinSize / 2 + StartOffset,
+                    cpY1: MaxCotainerHeight + RadinPeak,
+                    xEnd: i * RadinSize + RadinSize + StartOffset,
+                    yEnd: MaxCotainerHeight,
+                    strokeColor: RGBA,
+                    lineWidth: LevelHeight * 2
+                },
+                hoverable: false
+            });
+            zr.addShape(BezierCurveObj);
+            RadinPeak = -RadinPeak;
+            zr.animate(BezierCurveObj.id, "", true).when(SpeedTime + TimeOffset, {
+                position: [RadinSize * 2, 0]
+            }).start();
+        }
+    }
+</script>
+</body>
+</html>
