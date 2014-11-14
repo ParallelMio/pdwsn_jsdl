@@ -69,7 +69,9 @@
                 var pipStrokeColor = '#000';
                 var pipeLineWidth = 2;
                 var pipeHeight = height - 200;
+                // 背景墙
                 DrawImage(zr, ImageShape, 'img/wall.jpg', 300, pipeHeight - 130, 400,330);
+                // 波浪
                 DrawWave(zr, BezierCurveShape, PeakNum, RadinSize, MaxCotainerHeight, LevelHeight, RadinPeak, SpeedTime, 0, 0, 'rgba(0,153,204,0.4)');
                 DrawWave(zr, BezierCurveShape, PeakNum, RadinSize, MaxCotainerHeight, LevelHeight, RadinPeak, SpeedTime, 200, 50, 'rgba(0,153,204,0.2)');
                 // 左侧 横着
